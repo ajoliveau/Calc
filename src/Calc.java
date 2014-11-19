@@ -1,15 +1,42 @@
-class Arbre {
+/**
+* Programme Calc
+*
+* Lit une expression arithmétique en notation préfixe utilisant les quatres
+* opérations basiques et une variable x.
+* Le programme offre ensuite la possibilité de spécifier une valeur de x, de 
+* calculer le résultat de cette expression, et de l'afficher en notation infixe 
+*
+* Paramètres :
+* - L'expression a évaluer, constituée de caractéres
+* - Une ou plusieurs commandes :
+*       - La commande 'x' suivie d'un nombre qui assigne ce nombre a la valeur de x
+*       - La commande '=' qui calcule le résultat de l'expression
+*       - La commande '>' qui affiche l'expression en notation infixe
+* - La saisie s'arrête lorsque l'utilisateur entre le caractère '.'
+* 
+* Fonctionnement :
+* 
+*
+*
+*
+* Programme par Arthur Joliveau-Breney
+* JOLA11049104
+*/
+
+
+
+class Branche {
     public int type; // 0 = nombre, 1 = addition, 2 = soustraction, 3= multiplication, 4 = division, 5 = x
     public int val;  // valeur de l'entier si type = 0
-    public Arbre filsGauche;
-    public Arbre filsDroit;
+    public Branche filsGauche;
+    public Branche filsDroit;
     
-    Arbre(int type, int val) {
+    Branche(int type, int val) {
         this.type = type;
         this.val = val;
     }
     
-    Arbre() {
+    Branche() {
         
     }
 }
@@ -20,13 +47,14 @@ public class Calc {
     public static void main(String[] args) {
         int total;
         int valeurX = 1;
-        Arbre racine = new Arbre();
-        Arbre courant = racine;
-        constructionBranche(courant);
+        Branche racine = new Branche(); //reference vers l'arbre au complet
+        Branche courant = racine;
+        
+        constructionArbre(courant); //construit récursivement l'arbre
         
         char caractere = Pep8.chari();
         
-        while (caractere != '.') {
+        while (caractere != '.') { //boucle dans les commandes de calcul et d'affichage
             if (caractere == '=') {
                 total = calculerTotal(racine,valeurX);
                 Pep8.deco(total);
@@ -37,7 +65,7 @@ public class Calc {
                 Pep8.charo('\n');
             }
             else if (caractere == 'x') {
-                valeurX = Pep8.deci();
+                valeurX = lectureNombre(Pep8.deci());
             }
             caractere = Pep8.chari();
         }
@@ -59,7 +87,7 @@ public class Calc {
         
     }
     
-    public static void constructionBranche(Arbre courant) {
+    public static void constructionArbre(Branche courant) {
         char caractere = Pep8.chari();
         if (caractere == '+' || caractere == '-' ||caractere == '*' ||caractere == '/') {     
             switch(caractere) {
@@ -76,10 +104,10 @@ public class Calc {
                     courant.type = 4;
                     break;
             }
-            courant.filsGauche = new Arbre();
-            constructionBranche(courant.filsGauche);
-            courant.filsDroit = new Arbre();
-            constructionBranche(courant.filsDroit);            
+            courant.filsGauche = new Branche();
+            constructionArbre(courant.filsGauche);
+            courant.filsDroit = new Branche();
+            constructionArbre(courant.filsDroit);            
         }
         else if (caractere >= '0' && caractere <= '9') {
             courant.type = 0;
@@ -89,13 +117,13 @@ public class Calc {
             courant.type = 5;
         }
         else if (caractere == ' ' || caractere == '\n') {
-            constructionBranche(courant);
+            constructionArbre(courant);
         }
     }
     
   
     
-    public static void afficherInfixe(Arbre courant) {
+    public static void afficherInfixe(Branche courant) {
         if (courant.type == 0) {
            Pep8.deco(courant.val); 
         }
@@ -125,7 +153,7 @@ public class Calc {
         
     }
     
-    public static int calculerTotal(Arbre courant, int valeurX) {
+    public static int calculerTotal(Branche courant, int valeurX) {
         int valeur;
         if (courant.type == 0) {
             valeur = courant.val;
@@ -166,20 +194,20 @@ public class Calc {
  
     }
     
-    public static int addition(Arbre courant, int valeurX) {
+    public static int addition(Branche courant, int valeurX) {
         return calculerTotal(courant.filsGauche, valeurX) + calculerTotal(courant.filsDroit, valeurX);
         
     }
     
-    public static int multiplication(Arbre courant, int valeurX) {
+    public static int multiplication(Branche courant, int valeurX) {
         return calculerTotal(courant.filsGauche, valeurX) * calculerTotal(courant.filsDroit, valeurX);
     }
     
-    public static int division(Arbre courant, int valeurX) {
+    public static int division(Branche courant, int valeurX) {
         return calculerTotal(courant.filsGauche, valeurX) / calculerTotal(courant.filsDroit, valeurX);
     }
     
-    public static int soustraction(Arbre courant, int valeurX) {
+    public static int soustraction(Branche courant, int valeurX) {
         return calculerTotal(courant.filsGauche, valeurX) - calculerTotal(courant.filsDroit, valeurX);
     }
     
